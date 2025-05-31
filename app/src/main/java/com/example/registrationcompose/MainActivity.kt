@@ -39,143 +39,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.registrationcompose.ui.composables.RegisterScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            LoginField()
-        }
-    }
-
-    @Preview
-    @Composable
-    fun LoginField() {
-        var email by remember { mutableStateOf("") }
-        var name by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "SignUp",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        color = Color.Black
-                    )
-                )
-            }
-            Spacer(Modifier.height(30.dp))
-
-            InputField(
-                "Enter Email",
-                email,
-                { email = it },
-                Icons.Default.Email,
-                "example@gmail.com",
-                KeyboardType.Email
-            )
-            Spacer(Modifier.height(15.dp))
-
-            InputField(
-                "Enter Name",
-                name,
-                { name = it },
-                Icons.Default.AccountCircle,
-                "Awais",
-                KeyboardType.Text
-            )
-            Spacer(Modifier.height(15.dp))
-
-            InputField(
-                "Enter Password",
-                password,
-                { password = it },
-                Icons.Default.Lock,
-                "******",
-                KeyboardType.Password
-            )
-            Spacer(Modifier.height(35.dp))
-
-            Button(
-                onClick = {
-                    onRegisterClick(name, password, email)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-            ) {
-                Text("Register")
+            RegisterScreen { name, password, email ->
+                Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    @Composable
-    fun InputField(
-        label: String,
-        value: String,
-        onValueChange: (String) -> Unit,
-        icon: ImageVector,
-        placeholder: String,
-        keyboardType: KeyboardType
-    ) {
-        Text(label, modifier = Modifier.fillMaxWidth(), fontSize = 16.sp)
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = { Text(placeholder) },
-            leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-        )
-    }
-
-    private fun onRegisterClick(name: String, password: String, email: String) {
-        if (isValidate(name, password, email)) {
-            Toast.makeText(this, "Registeration Succefull", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun isValidate(name: String, password: String, email: String): Boolean {
-        if (name.isBlank()) {
-            Toast.makeText(this, "Name is required", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (email.isBlank()) {
-            Toast.makeText(this, "Email is required", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Enter a valid email", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (password.isBlank()) {
-            Toast.makeText(this, "Password is required", Toast.LENGTH_SHORT).show()
-            return false
-        }
-
-        if (password.length < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT)
-                .show()
-            return false
-        }
-
-        return true
     }
 
     /*@Preview
