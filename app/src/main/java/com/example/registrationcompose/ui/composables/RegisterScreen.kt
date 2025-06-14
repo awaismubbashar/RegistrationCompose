@@ -2,6 +2,7 @@ package com.example.registrationcompose.ui.composables
 
 import android.util.Patterns
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
@@ -31,14 +34,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.registrationcompose.utils.validateInputs
+import com.example.registrationcompose.viewmodel.RegisterViewModel
 
 @Composable
-fun RegisterScreen(onRegisterClick: (String, String, String) -> Unit) {
+fun RegisterScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val registerViewModel: RegisterViewModel = hiltViewModel()
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -46,6 +54,7 @@ fun RegisterScreen(onRegisterClick: (String, String, String) -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
@@ -94,7 +103,12 @@ fun RegisterScreen(onRegisterClick: (String, String, String) -> Unit) {
         Button(
             onClick = {
                 if (context.validateInputs(name = name, password = password, email = email)) {
-                    onRegisterClick(name, password, email)
+                    registerViewModel.saveUser(name = name, password =  password, email = email)
+                    Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+                    // ✅ Navigate to LoginScreen
+                    navController.navigate("login") {
+                        popUpTo("registration") { inclusive = true } // Optional: clears back stack
+                    }
                 }
             },
             modifier = Modifier
@@ -104,11 +118,28 @@ fun RegisterScreen(onRegisterClick: (String, String, String) -> Unit) {
         ) {
             Text("Register")
         }
+        Spacer(Modifier.height(10.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Text(
+                text = "Already have an account? Login",
+                modifier = Modifier.clickable {
+                    navController.navigate("login") {
+                        popUpTo("registration") { inclusive = true }
+                    }
+                },
+                color = Color.Blue // Optional for a link-like style
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen { _, _, _ -> }
+    val fakeNavController = rememberNavController()
+    RegisterScreen(navController = fakeNavController)
 }

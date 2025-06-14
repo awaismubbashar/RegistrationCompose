@@ -2,13 +2,18 @@ package com.example.registrationcompose.ui.composables
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -30,11 +35,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.registrationcompose.utils.validateLoginInput
 import com.example.registrationcompose.viewmodel.RegisterViewModel
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -43,7 +50,8 @@ fun LoginScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -67,8 +75,8 @@ fun LoginScreen() {
         // Password Textview
         InputField(
             "Enter Password",
-            email,
-            { email = it },
+            password,
+            { password = it },
             Icons.Default.Lock,
             "******",
             KeyboardType.Email
@@ -77,8 +85,8 @@ fun LoginScreen() {
         // Login Button
         Button(
             onClick = {
-                if (context.validateLoginInput(email = email, password =  password)) {
-                    onLogin(email, password, context, viewModel)
+                if (context.validateLoginInput(email = email, password = password)) {
+                    onLogin(email, password, context, viewModel, navController)
                 }
             },
             modifier = Modifier
@@ -88,16 +96,37 @@ fun LoginScreen() {
         ) {
             Text("Login")
         }
+        Spacer(Modifier.height(10.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Text(
+                text = "Don't have an account? Register",
+                modifier = Modifier.clickable {
+                    navController.navigate("register") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                color = Color.Blue // Optional for a link-like style
+            )
+        }
+
+
     }
 }
 
-fun onLogin(email: String, password: String, context: Context, viewModel: RegisterViewModel) {
+fun onLogin(email: String, password: String, context: Context, viewModel: RegisterViewModel, navController: NavController) {
     viewModel.onLogin(
         email = email,
         password = password,
         onSuccess = {
             Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
             // Navigate to home or next screen
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
         },
         onError = {
             Toast.makeText(context, "Invalid email or password", Toast.LENGTH_SHORT).show()
@@ -109,5 +138,6 @@ fun onLogin(email: String, password: String, context: Context, viewModel: Regist
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    val fakeNavController = rememberNavController()
+    LoginScreen(fakeNavController)
 }
