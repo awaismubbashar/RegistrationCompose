@@ -118,7 +118,7 @@ fun LoginScreen(navController: NavController) {
 }
 
 fun onLogin(email: String, password: String, context: Context, viewModel: RegisterViewModel, navController: NavController) {
-    viewModel.onLogin(
+    viewModel.loginUser(
         email = email,
         password = password,
         onSuccess = {
@@ -128,8 +128,8 @@ fun onLogin(email: String, password: String, context: Context, viewModel: Regist
                 popUpTo("login") { inclusive = true }
             }
         },
-        onError = {
-            Toast.makeText(context, "Invalid email or password", Toast.LENGTH_SHORT).show()
+        onError = { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     )
 }

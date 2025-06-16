@@ -103,12 +103,21 @@ fun RegisterScreen(navController: NavController) {
         Button(
             onClick = {
                 if (context.validateInputs(name = name, password = password, email = email)) {
-                    registerViewModel.saveUser(name = name, password =  password, email = email)
-                    Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
-                    // ✅ Navigate to LoginScreen
-                    navController.navigate("login") {
-                        popUpTo("registration") { inclusive = true } // Optional: clears back stack
-                    }
+                    registerViewModel.registerUser(
+                        name = name,
+                        email = email,
+                        password = password,
+                        onSuccess = {
+                            Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+                            // ✅ Navigate to LoginScreen
+                            navController.navigate("login") {
+                                popUpTo("registration") { inclusive = true } // Optional: clears back stack
+                            }
+                        },
+                        onError = { message ->
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
             },
             modifier = Modifier
