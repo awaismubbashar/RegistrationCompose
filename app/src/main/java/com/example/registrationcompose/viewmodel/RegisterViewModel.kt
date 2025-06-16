@@ -66,15 +66,6 @@ class RegisterViewModel @Inject constructor(
             }
     }
 
-
-    fun saveUser(name: String, email: String, password: String) {
-        viewModelScope.launch {
-            DataStoreUtils.saveData(userDataStore.dataStore, "name", name)
-            DataStoreUtils.saveData(userDataStore.dataStore, "email", email)
-            DataStoreUtils.saveData(userDataStore.dataStore, "password", password)
-        }
-    }
-
     private fun getUser() {
         viewModelScope.launch {
             val name = DataStoreUtils.getData(userDataStore.dataStore, "name", "").first()
@@ -83,34 +74,4 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun checkCredentials(
-        email: String,
-        password: String,
-        onResult: (Boolean) -> Unit
-    ) {
-        viewModelScope.launch {
-            val savedEmail = DataStoreUtils.getData(userDataStore.dataStore, "email", "")
-                .first()
-            val savedPassword = DataStoreUtils.getData(userDataStore.dataStore, "password", "")
-                .first()
-
-            val isValid = (email == savedEmail && password == savedPassword)
-            onResult(isValid)
-        }
-    }
-
-    fun onLogin(
-        email: String,
-        password: String,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        checkCredentials(email, password) { isValid ->
-            if (isValid) {
-                onSuccess()
-            } else {
-                onError()
-            }
-        }
-    }
 }
